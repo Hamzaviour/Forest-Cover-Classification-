@@ -95,7 +95,15 @@ A professional Streamlit application for forest cover type classification using 
 
 ## 📊 Screenshots
 
-*Add screenshots of your application here*
+<img width="3000" height="1800" alt="Feature_Importance_xgb" src="https://github.com/user-attachments/assets/0eba258a-3898-4918-b5a1-41eaf5aa72c7" />
+<img width="3000" height="1800" alt="Feature_Importance_rf" src="https://github.com/user-attachments/assets/4e17a225-889a-4d1e-95e3-b8299a7b873d" />
+<img width="3000" height="1800" alt="Feature_Importance_dt" src="https://github.com/user-attachments/assets/6f6eb0eb-e475-4317-bd1f-fffc82e70141" />
+<img width="2400" height="1500" alt="distribution_cover_types" src="https://github.com/user-attachments/assets/c76fbfae-d002-4509-b5cb-f7cba2fef7a5" />
+<img width="1920" height="1440" alt="Confusion_Matrix_Xgb" src="https://github.com/user-attachments/assets/aa9ec5d1-d684-407d-b5f5-9a5a228fdce8" />
+<img width="1920" height="1440" alt="confusion_matrix_rf" src="https://github.com/user-attachments/assets/a3d3d0f6-fd64-4e48-8eb2-5f61f516076b" />
+<img width="1920" height="1440" alt="confusion_matrix_dt" src="https://github.com/user-attachments/assets/4ca19fb0-d73d-4b86-b052-ddfe63b6ace3" />
+<img width="3000" height="1800" alt="model_comparison" src="https://github.com/user-attachments/assets/79a4bf85-9ee0-45f6-8a1d-eebd37e15975" />
+
 
 
 
