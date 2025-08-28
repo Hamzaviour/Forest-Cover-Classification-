@@ -11,7 +11,7 @@ A professional Streamlit application for forest cover type classification using 
 
 ## 🚀 Live Demo
 
-🌐 **[Try the Live Application](https://forest-cover-classification-by-hamza.streamlit.app/)**
+🌐 **[Try the Live Application](https://forest-cover-classification.streamlit.app/)**
 
 ## Features
 
