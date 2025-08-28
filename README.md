@@ -1,4 +1,4 @@
-# 🌲 Forest Cover Classification Dashboard
+# 🌲 Forest Cover Classification System
 
 A professional Streamlit application for forest cover type classification using advanced machine learning algorithms.
 
@@ -11,7 +11,7 @@ A professional Streamlit application for forest cover type classification using 
 
 ## 🚀 Live Demo
 
-🌐 **[Try the Live Application](https://your-streamlit-app-url.streamlit.app)** *(Update with your deployed URL)*
+🌐 **[Try the Live Application](https://forest-cover-classification-by-hamza.streamlit.app/)**
 
 ## Features
 
@@ -91,43 +91,13 @@ A professional Streamlit application for forest cover type classification using 
 4. Analyze detailed metrics in Performance Analysis
 5. Make predictions using the interactive Predictions interface
 
-## 🚀 Deployment
 
-### Deploy to Streamlit Cloud
-1. Push your code to GitHub
-2. Go to [share.streamlit.io](https://share.streamlit.io)
-3. Connect your GitHub repository
-4. Deploy with one click!
-
-### Deploy to Heroku
-```bash
-# Create Procfile
-echo "web: sh setup.sh && streamlit run app.py" > Procfile
-
-# Create setup.sh
-echo "mkdir -p ~/.streamlit/
-echo \"[server]
-headless = true
-port = \$PORT
-enableCORS = false
-\" > ~/.streamlit/config.toml" > setup.sh
-```
 
 ## 📊 Screenshots
 
 *Add screenshots of your application here*
 
-## 🤝 Contributing
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🙏 Acknowledgments
 
@@ -138,9 +108,9 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📧 Contact
 
 **Hamza Younas**
-- GitHub: [@your-github-username](https://github.com/your-github-username)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/your-profile)
-- Email: your.email@example.com
+- GitHub: [@Hamzaviour](https://github.com/Hamzaviour)
+- LinkedIn: [Hamza Younas](https://linkedin.com/in/hamza-younas)
+- Email: hamzavelous@gmail.com
 
 ---
 

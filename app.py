@@ -19,6 +19,14 @@ import pickle
 import os
 from io import BytesIO
 import matplotlib.pyplot as plt
+import gc  # For manual garbage collection
+import psutil  # For memory monitoring
+
+# Memory monitoring utility
+def get_memory_usage():
+    """Get current memory usage in MB"""
+    process = psutil.Process(os.getpid())
+    return process.memory_info().rss / 1024 / 1024
 
 # Page configuration
 st.set_page_config(
@@ -193,37 +201,62 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Load data and models
-@st.cache_data
+# Load data and models with memory optimization
+@st.cache_data(ttl=3600, max_entries=1)  # Cache for 1 hour, max 1 entry
 def load_data():
-    """Load and preprocess the forest cover dataset"""
+    """Load and preprocess the forest cover dataset with memory optimization"""
     try:
-        column_names = [
-            'Elevation','Aspect','Slope','Horizontal_Distance_To_Hydrology','Vertical_Distance_To_Hydrology',
-            'Horizontal_Distance_To_Roadways','Hillshade_9am','Hillshade_Noon','Hillshade_3pm',
-            'Horizontal_Distance_To_Fire_Points','Wilderness_Area1','Wilderness_Area2','Wilderness_Area3',
-            'Wilderness_Area4','Soil_Type1','Soil_Type2','Soil_Type3','Soil_Type4','Soil_Type5','Soil_Type6',
-            'Soil_Type7','Soil_Type8','Soil_Type9','Soil_Type10','Soil_Type11','Soil_Type12','Soil_Type13',
-            'Soil_Type14','Soil_Type15','Soil_Type16','Soil_Type17','Soil_Type18','Soil_Type19','Soil_Type20',
-            'Soil_Type21','Soil_Type22','Soil_Type23','Soil_Type24','Soil_Type25','Soil_Type26','Soil_Type27',
-            'Soil_Type28','Soil_Type29','Soil_Type30','Soil_Type31','Soil_Type32','Soil_Type33','Soil_Type34',
-            'Soil_Type35','Soil_Type36','Soil_Type37','Soil_Type38','Soil_Type39','Soil_Type40','Cover_Type'
-        ]
-        
-        df = pd.read_csv('covtype.csv', header=None, names=column_names)
-        df['Cover_Type_numeric'] = pd.to_numeric(df['Cover_Type'], errors='coerce')
-        df_clean = df[df['Cover_Type_numeric'].notna()].copy()
-        
-        return df_clean
+        with st.spinner("Loading dataset... This may take a moment for large files."):
+            column_names = [
+                'Elevation','Aspect','Slope','Horizontal_Distance_To_Hydrology','Vertical_Distance_To_Hydrology',
+                'Horizontal_Distance_To_Roadways','Hillshade_9am','Hillshade_Noon','Hillshade_3pm',
+                'Horizontal_Distance_To_Fire_Points','Wilderness_Area1','Wilderness_Area2','Wilderness_Area3',
+                'Wilderness_Area4','Soil_Type1','Soil_Type2','Soil_Type3','Soil_Type4','Soil_Type5','Soil_Type6',
+                'Soil_Type7','Soil_Type8','Soil_Type9','Soil_Type10','Soil_Type11','Soil_Type12','Soil_Type13',
+                'Soil_Type14','Soil_Type15','Soil_Type16','Soil_Type17','Soil_Type18','Soil_Type19','Soil_Type20',
+                'Soil_Type21','Soil_Type22','Soil_Type23','Soil_Type24','Soil_Type25','Soil_Type26','Soil_Type27',
+                'Soil_Type28','Soil_Type29','Soil_Type30','Soil_Type31','Soil_Type32','Soil_Type33','Soil_Type34',
+                'Soil_Type35','Soil_Type36','Soil_Type37','Soil_Type38','Soil_Type39','Soil_Type40','Cover_Type'
+            ]
+            
+            # The CSV file has headers, so read it normally
+            # First read without dtype to avoid conversion errors
+            df = pd.read_csv('covtype.csv', low_memory=False)
+            
+            # Optimize data types for memory efficiency after loading
+            for col in df.columns:
+                if col != 'Cover_Type':  # Skip the target column for now
+                    if 'Wilderness_Area' in col or 'Soil_Type' in col:
+                        df[col] = df[col].astype('int8')  # Binary features
+                    else:
+                        df[col] = pd.to_numeric(df[col], errors='coerce').astype('int16')  # Numeric features
+            
+            # Convert target variable
+            df['Cover_Type_numeric'] = pd.to_numeric(df['Cover_Type'], errors='coerce').astype('int8')
+            df_clean = df[df['Cover_Type_numeric'].notna()].copy()
+            
+            # Force garbage collection
+            gc.collect()
+            
+            st.success(f"✅ Dataset loaded successfully! Memory usage: {get_memory_usage():.1f} MB")
+            return df_clean
+            
     except FileNotFoundError:
         st.error("❌ Dataset file 'covtype.csv' not found. Please ensure the file is in the same directory.")
         return None
+    except Exception as e:
+        st.error(f"❌ Error loading dataset: {str(e)}")
+        return None
 
-@st.cache_resource
+@st.cache_resource(ttl=7200, max_entries=1)  # Cache for 2 hours, max 1 entry
 def load_models_and_train():
-    """Load or train models"""
+    """Load or train models with memory optimization"""
     models = {}
     metrics = {}
+    
+    # Display memory usage
+    initial_memory = get_memory_usage()
+    st.info(f"🔧 Initial memory usage: {initial_memory:.1f} MB")
     
     # Try to load existing models
     try:
@@ -363,12 +396,16 @@ if section == "📊 Data Exploration":
         """.format(), unsafe_allow_html=True)
     
     with col4:
+        if df is not None:
+            dataset_size = df.memory_usage(deep=True).sum() / 1024 / 1024
+        else:
+            dataset_size = 0.0
         st.markdown("""
         <div class="metric-card">
             <h3>💾 Dataset Size</h3>
             <h2>{:.1f} MB</h2>
         </div>
-        """.format(df.memory_usage(deep=True).sum() / 1024 / 1024), unsafe_allow_html=True)
+        """.format(dataset_size), unsafe_allow_html=True)
     
     st.markdown("---")
     
@@ -785,6 +822,24 @@ elif section == "🔮 Predictions":
     else:
         st.error("❌ Models not available for predictions. Please check if models are trained.")
 
+# Memory optimization and cleanup
+if st.sidebar.button("🧹 Clear Cache & Free Memory"):
+    st.cache_data.clear()
+    st.cache_resource.clear()
+    gc.collect()
+    st.sidebar.success("✅ Cache cleared and memory optimized!")
+
+# Display current memory usage in sidebar
+if st.sidebar.checkbox("📊 Show Memory Usage"):
+    current_memory = get_memory_usage()
+    st.sidebar.metric("💾 Memory Usage", f"{current_memory:.1f} MB")
+    
+    # Memory usage warning
+    if current_memory > 800:  # Warning at 800MB
+        st.sidebar.warning("⚠️ High memory usage detected. Consider clearing cache.")
+    elif current_memory > 500:  # Caution at 500MB
+        st.sidebar.info("ℹ️ Memory usage is moderate. Monitor if needed.")
+
 # Footer
 st.markdown("---")
 st.markdown("""
@@ -792,5 +847,11 @@ st.markdown("""
     <p>🌲 Forest Cover Classification Dashboard | Built with Streamlit</p>
     <p>Machine Learning Models: Random Forest, XGBoost, Decision Tree</p>
     <p><strong>Created by Hamza Younas | Elevvo Pathways</strong></p>
+    <p style="font-size: 0.8em; margin-top: 1rem;">
+        💡 Optimized for Streamlit Cloud deployment with memory management
+    </p>
 </div>
 """, unsafe_allow_html=True)
+
+# Force garbage collection at the end
+gc.collect()
